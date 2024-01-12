@@ -1,9 +1,11 @@
 Enter, my AlgoTrading.
 
-## What is AlgoTrading?
+## What is AlgoTrading? 
+( I should rename this to fintech engineering education and make it more generalized. )
 AlgoTrading is a Python library for Algorithmic Trading. It is a collection of tools for developing and backtesting trading strategies. It is designed to be intuitive, flexible, and extensible. It is built on top of the popular libraries such as Pandas, Numpy, and Matplotlib.
 
 This repo is dedicated to all of my educational projects in the field of algorithmic trading.
+The content in this repo should mainly be used for educational purposes and not my production projects.
 
 ## List of Projects
 - AlpacaApi - Simple projects to test the Alpaca API.
