@@ -1,4 +1,6 @@
 **/virtualenv
 .virtualenv
+**/virtenv
+.virtenv
 **/venv
 .venv
