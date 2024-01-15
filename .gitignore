@@ -1,6 +1,11 @@
+# Virtual Environments
 **/virtualenv
 .virtualenv
 **/virtenv
 .virtenv
 **/venv
 .venv
+
+# Secret Files
+**/passwd.txt
+**/email.txt
