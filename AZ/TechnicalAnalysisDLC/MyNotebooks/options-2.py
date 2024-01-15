@@ -129,7 +129,7 @@ def backtest(ticker, exp_date, client):
 
     print(f"Total Profit: {round(total_profit, 2)}")
 
-client = ThetaClient(username="tyalorkny@gmail.com", passwd=open("passwd.txt", "r").read())
+client = ThetaClient(username=open("email.txt", "r").read(), passwd=open("passwd.txt", "r").read())
 
 with client.connect():
     # ticker = "AAPL"

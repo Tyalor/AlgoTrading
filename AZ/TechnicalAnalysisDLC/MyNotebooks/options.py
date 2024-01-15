@@ -28,7 +28,7 @@ def create_signals(ticker, exp_date, client):
             continue
 
 # client = ThetaClient(launch=False)
-client = ThetaClient(username="tyalorkny@gmail.com", passwd=open("passwd.txt", "r").read())
+client = ThetaClient(username=open("email.txt", "r").read(), passwd=open("passwd.txt", "r").read())
 
 # with client.connect():
 #     ticker = "BMY"
