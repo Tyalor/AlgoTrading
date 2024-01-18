@@ -5,12 +5,17 @@ from django.shortcuts import render
 
 
 def index(request):
-    error_message = None  # Variable to store the error message
+    error_message = None
+    processed_data = [] 
+    
+    # Set default dates
+    default_start_date = datetime.now().strftime("%Y-%m-%d")
+    default_end_date = (datetime.now() + timedelta(days=60)).strftime("%Y-%m-%d")
 
     if request.method == 'POST':
         ticker_input = request.POST.get('tickers')
-        start_date = request.POST.get('start_date')
-        end_date = request.POST.get('end_date')
+        start_date = request.POST.get('start_date') or default_start_date
+        end_date = request.POST.get('end_date') or default_end_date
         min_price = request.POST.get('min_price')
         max_price = request.POST.get('max_price')
 
@@ -55,11 +60,18 @@ def index(request):
 
                 processed_data.append(ticker_data)
 
-            return render(request, 'options_app/index.html', {'data': processed_data, 'error_message': error_message})
+    else:
+        # For a GET request or initial page load, set default dates
+        start_date = default_start_date
+        end_date = default_end_date
 
-    # For a GET request or if there's an error message, render the form
-    return render(request, 'options_app/index.html', {'error_message': error_message})
-
+    # Render the form. This part will execute for both POST and GET requests
+    return render(request, 'options_app/index.html', {
+        'error_message': error_message, 
+        'start_date': start_date, 
+        'end_date': end_date,
+        'data': processed_data 
+    })
 
 # Function to get put-to-call ratio and last price of the underlying
 def get_underlying_data(ticker):
@@ -67,6 +79,7 @@ def get_underlying_data(ticker):
         stock_data = ticker.history(period="1d")
         last_price = stock_data['Close'].iloc[-1]
         timestamp = stock_data.index[-1]
+        formatted_timestamp = timestamp.strftime('%Y-%m-%d %H:%M:%S')
         options_data = ticker.options
         puts, calls = 0, 0
         for date in options_data:
@@ -74,15 +87,20 @@ def get_underlying_data(ticker):
             puts += opt.puts['openInterest'].sum()
             calls += opt.calls['openInterest'].sum()
         put_to_call_ratio = puts / calls if calls > 0 else float('inf')
-        return last_price, timestamp, put_to_call_ratio
+        return last_price, formatted_timestamp, put_to_call_ratio
     except Exception as e:
         return None, None, None
 
 # Function to get filtered options data
 def get_filtered_options_data(symbol, expiration_date, min_price, max_price, min_volume, min_open_interest, std_dev_filter=None):
     ticker = yf.Ticker(symbol)
-    last_price = ticker.history(period="1d")['Close'].iloc[-1]
+    history = ticker.history(period="1d")['Close']
     std_dev = ticker.history(period='1y')['Close'].std()
+    if history.empty:
+        print(f"No data returned for {symbol} on this date.")
+        return None, None
+
+    last_price = history.iloc[-1]
 
     try:
         options_data = ticker.option_chain(expiration_date)

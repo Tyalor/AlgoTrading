@@ -1,75 +1,102 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Finance Data Results</title>
-    <style>
-        table, th, td {
-            border: 1px solid black;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 5px;
-        }
-    </style>
-</head>
-<body>
+{% load static %}
+
+{% block content %}
 {% if data %}
-    <h1>Finance Data Results</h1>
-    {% for ticker in data %}
-        <h2>{{ ticker.symbol }}</h2>
-        <p>Last Price: {{ ticker.last_price }} (as of {{ ticker.timestamp }})</p>
-        <p>Put-to-Call Ratio: {{ ticker.put_to_call_ratio }}</p>
-        {% for option in ticker.options %}
-            <h3>Expiration Date: {{ option.expiration_date }}</h3>
-            <h4>Calls</h4>
-            <table>
-                <tr>
-                    <th>Contract Symbol</th>
-                    <th>Last Trade Date</th>
-                    <th>Strike</th>
-                    <th>Last Price</th>
-                    <th>Volume</th>
-                    <th>Open Interest</th>
-                    <!-- Add more columns if needed -->
-                </tr>
-                {% for call in option.calls %}
-                    <tr>
-                        <td>{{ call['contractSymbol'] }}</td>
-                        <td>{{ call['lastTradeDate'] }}</td>
-                        <td>{{ call['strike'] }}</td>
-                        <td>{{ call['lastPrice'] }}</td>
-                        <td>{{ call['volume'] }}</td>
-                        <td>{{ call['openInterest'] }}</td>
-                        <!-- Add more data fields as needed -->
-                    </tr>
-                {% endfor %}
-            </table>
-            <h4>Puts</h4>
-            <table>
-                <tr>
-                    <th>Contract Symbol</th>
-                    <th>Last Trade Date</th>
-                    <th>Strike</th>
-                    <th>Last Price</th>
-                    <th>Volume</th>
-                    <th>Open Interest</th>
-                    <!-- Add more columns if needed -->
-                </tr>
-                {% for put in option.puts %}
-                    <tr>
-                        <td>{{ put['contractSymbol'] }}</td>
-                        <td>{{ put['lastTradeDate'] }}</td>
-                        <td>{{ put['strike'] }}</td>
-                        <td>{{ put['lastPrice'] }}</td>
-                        <td>{{ put['volume'] }}</td>
-                        <td>{{ put['openInterest'] }}</td>
-                        <!-- Add more data fields as needed -->
-                    </tr>
-                {% endfor %}
-            </table>
+    <h2 class="text-center mb-4">Filtered Contract Results</h2>
+    <ul class="nav nav-tabs" id="tickerTab" role="tablist">
+        {% for ticker in data %}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link {% if forloop.first %}active{% endif %}" id="tab-{{ ticker.symbol }}-tab" data-bs-toggle="tab" data-bs-target="#tab-{{ ticker.symbol }}" type="button" role="tab" aria-controls="tab-{{ ticker.symbol }}" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+                    {{ ticker.symbol.upper }}
+                </button>
+            </li>
         {% endfor %}
-    {% endfor %}
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        {% for ticker in data %}
+            <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="tab-{{ ticker.symbol }}" role="tabpanel" aria-labelledby="tab-{{ ticker.symbol }}-tab">
+                <p>Underlying Last Price: {{ ticker.last_price }}</p>
+                <p>Put-to-Call Ratio: {{ ticker.put_to_call_ratio }}</p>
+                <div class="accordion" id="accordionOptions-{{ ticker.symbol }}">
+                    {% for option in ticker.options %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                                <button class="accordion-button btn-dark {% if not forloop.first %} collapsed {% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ ticker.symbol }}-{{ forloop.counter }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse-{{ ticker.symbol }}-{{ forloop.counter }}">
+                                    Expiration Date: {{ option.expiration_date }}
+                                </button>
+                            </h2>
+                            <div id="collapse-{{ ticker.symbol }}-{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading{{ forloop.parentloop.counter }}-{{ forloop.counter }}" data-bs-parent="#accordionOptions-{{ ticker.symbol }}">
+                                <div class="accordion-body bg-dark text-white">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <h4>Calls</h4>
+                                            <table class="table dataTable table-dark table-striped" id="calls-table-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Contract Symbol</th>
+                                                        <th>Last Trade Date</th>
+                                                        <th>Strike</th>
+                                                        <th>Last Price</th>
+                                                        <th>Volume</th>
+                                                        <th>Open Interest</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for call in option.calls %}
+                                                        <tr>
+                                                            <td>{{ call.contractSymbol }}</td>
+                                                            <td>{{ call.lastTradeDate }}</td>
+                                                            <td>{{ call.strike }}</td>
+                                                            <td>{{ call.lastPrice }}</td>
+                                                            <td>{{ call.volume }}</td>
+                                                            <td>{{ call.openInterest }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <h4>Puts</h4>
+                                            <table class="table dataTable table-dark table-striped" id="puts-table-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Contract Symbol</th>
+                                                        <th>Last Trade Date</th>
+                                                        <th>Strike</th>
+                                                        <th>Last Price</th>
+                                                        <th>Volume</th>
+                                                        <th>Open Interest</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for put in option.puts %}
+                                                        <tr>
+                                                            <td>{{ put.contractSymbol }}</td>
+                                                            <td>{{ put.lastTradeDate }}</td>
+                                                            <td>{{ put.strike }}</td>
+                                                            <td>{{ put.lastPrice }}</td>
+                                                            <td>{{ put.volume }}</td>
+                                                            <td>{{ put.openInterest }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <br>
+                <p>Data Pull Time: {{ ticker.timestamp }}</p>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+<div class="d-flex justify-content-center align-items-center" style="height: 5rem;">
+    <p>No data available. Please enter a query</p>
+</div>
+
 {% endif %}
-</body>
-</html>
+{% endblock %}
