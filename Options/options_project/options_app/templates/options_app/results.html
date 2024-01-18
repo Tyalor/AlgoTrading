@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Finance Data Results</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+{% if data %}
+    <h1>Finance Data Results</h1>
+    {% for ticker in data %}
+        <h2>{{ ticker.symbol }}</h2>
+        <p>Last Price: {{ ticker.last_price }} (as of {{ ticker.timestamp }})</p>
+        <p>Put-to-Call Ratio: {{ ticker.put_to_call_ratio }}</p>
+        {% for option in ticker.options %}
+            <h3>Expiration Date: {{ option.expiration_date }}</h3>
+            <h4>Calls</h4>
+            <table>
+                <tr>
+                    <th>Contract Symbol</th>
+                    <th>Last Trade Date</th>
+                    <th>Strike</th>
+                    <th>Last Price</th>
+                    <th>Volume</th>
+                    <th>Open Interest</th>
+                    <!-- Add more columns if needed -->
+                </tr>
+                {% for call in option.calls %}
+                    <tr>
+                        <td>{{ call['contractSymbol'] }}</td>
+                        <td>{{ call['lastTradeDate'] }}</td>
+                        <td>{{ call['strike'] }}</td>
+                        <td>{{ call['lastPrice'] }}</td>
+                        <td>{{ call['volume'] }}</td>
+                        <td>{{ call['openInterest'] }}</td>
+                        <!-- Add more data fields as needed -->
+                    </tr>
+                {% endfor %}
+            </table>
+            <h4>Puts</h4>
+            <table>
+                <tr>
+                    <th>Contract Symbol</th>
+                    <th>Last Trade Date</th>
+                    <th>Strike</th>
+                    <th>Last Price</th>
+                    <th>Volume</th>
+                    <th>Open Interest</th>
+                    <!-- Add more columns if needed -->
+                </tr>
+                {% for put in option.puts %}
+                    <tr>
+                        <td>{{ put['contractSymbol'] }}</td>
+                        <td>{{ put['lastTradeDate'] }}</td>
+                        <td>{{ put['strike'] }}</td>
+                        <td>{{ put['lastPrice'] }}</td>
+                        <td>{{ put['volume'] }}</td>
+                        <td>{{ put['openInterest'] }}</td>
+                        <!-- Add more data fields as needed -->
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endfor %}
+    {% endfor %}
+{% endif %}
+</body>
+</html>

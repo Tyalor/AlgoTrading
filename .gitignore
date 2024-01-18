@@ -9,3 +9,4 @@
 # Secret Files
 **/passwd.txt
 **/email.txt
+**/.env

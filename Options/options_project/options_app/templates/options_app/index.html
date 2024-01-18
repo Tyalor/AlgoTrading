@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OptionsScanner - A Simple Filter for Options Contracts</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>OptionsScanner</h1>
+    <h4>Please Enter Options Filter Settings</h4>
+    <form action="" method="post">
+        {% csrf_token %}
+        <label for="tickers">Tickers (separated by commas)*:</label>
+        <input type="text" id="tickers" name="tickers"><br><br>
+
+        <label for="start_date">Start Date (YYYY-MM-DD):</label>
+        <input type="date" id="start_date" name="start_date"><br><br>
+
+        <label for="end_date">End Date (YYYY-MM-DD):</label>
+        <input type="date" id="end_date" name="end_date"><br><br>
+
+        <label for="min_price">Minimum Option Price:</label>
+        <input type="number" id="min_price" name="min_price" step="0.01"><br><br>
+
+        <label for="max_price">Maximum Option Price:</label>
+        <input type="number" id="max_price" name="max_price" step="0.01"><br><br>
+
+        <label for="min_volume">Minimum Volume:</label>
+        <input type="number" id="min_volume" name="min_volume"><br><br>
+
+        <label for="min_open_interest">Minimum Open Interest:</label>
+        <input type="number" id="min_open_interest" name="min_open_interest"><br><br>
+
+        <label for="std_dev_filter">Standard Deviation Filter (1-3):</label>
+        <input type="number" id="std_dev_filter" name="std_dev_filter" step="1" min="1" max="3"><br><br>
+
+        <input type="submit" value="Submit">
+    </form>
+    {% if data %}
+    <h1>Finance Data Results</h1>
+    {% for ticker in data %}
+        <h4>{{ ticker.symbol }}</h4>
+        <p>Last Price: {{ ticker.last_price }} (as of {{ ticker.timestamp }})</p>
+        <p>Put-to-Call Ratio: {{ ticker.put_to_call_ratio }}</p>
+        {% for option in ticker.options %}
+            <h3>Expiration Date: {{ option.expiration_date }}</h3>
+            <h4>Calls</h4>
+            <table>
+                <tr>
+                    <th>Contract Symbol</th>
+                    <th>Last Trade Date</th>
+                    <th>Strike</th>
+                    <th>Last Price</th>
+                    <th>Volume</th>
+                    <th>Open Interest</th>
+                    <!-- Add more columns if needed -->
+                </tr>
+                {% for call in option.calls %}
+                    <tr>
+                        <td>{{ call.contractSymbol }}</td>
+                        <td>{{ call.lastTradeDate }}</td>
+                        <td>{{ call.strike }}</td>
+                        <td>{{ call.lastPrice }}</td>
+                        <td>{{ call.volume }}</td>
+                        <td>{{ call.openInterest }}</td>
+                        <!-- Add more data fields as needed -->
+                    </tr>
+                {% endfor %}
+            </table>
+            <h4>Puts</h4>
+            <table>
+                <tr>
+                    <th>Contract Symbol</th>
+                    <th>Last Trade Date</th>
+                    <th>Strike</th>
+                    <th>Last Price</th>
+                    <th>Volume</th>
+                    <th>Open Interest</th>
+                    <!-- Add more columns if needed -->
+                </tr>
+                {% for put in option.puts %}
+                    <tr>
+                        <td>{{ put.contractSymbol }}</td>
+                        <td>{{ put.lastTradeDate }}</td>
+                        <td>{{ put.strike }}</td>
+                        <td>{{ put.lastPrice }}</td>
+                        <td>{{ put.volume }}</td>
+                        <td>{{ put.openInterest }}</td>
+                        <!-- Add more data fields as needed -->
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endfor %}
+    {% endfor %}
+{% endif %}
+</body>
+<script>
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+</script>
+</html>
